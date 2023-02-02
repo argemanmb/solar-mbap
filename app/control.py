@@ -17,4 +17,4 @@ with open("config.json") as configuration:
     devices["wohnzimmer"].updateStatus()
     devices["wohnzimmer"].printStatus()
 
-    print (wechselrichter.GetStatus())
+    print (wechselrichter.getStatus())

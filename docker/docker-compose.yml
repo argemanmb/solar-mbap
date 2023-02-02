@@ -7,4 +7,4 @@ services:
     volumes:
       - ../app:/usr/src/app
     command:
-      - ./smartthings.py
+      - ./control.py

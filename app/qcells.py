@@ -8,7 +8,7 @@ class qcellDevice:
         self.token=token
         self.sn=sn
 
-    def GetStatus(self):
+    def getStatus(self):
         response = requests.get(apiUrl+self.token+"&sn="+self.sn)
         if not response.status_code == 200:
             print ("something went wrong")
