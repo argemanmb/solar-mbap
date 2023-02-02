@@ -1,0 +1,10 @@
+version: "3"
+services:
+  python:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - ../app:/usr/src/app
+    command:
+      - ./smartthings.py

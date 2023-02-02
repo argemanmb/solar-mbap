@@ -1,0 +1,13 @@
+#+title: README
+
+* solar-mbap
+This project is intended to improve the usage of solar generated
+power for a home project. It is not intended to be anything general
+or reuseable, just a home project with a distinct setup.
+
+** Useage
+Set up a config.json in the app folder that contains all devices that should
+be used.
+Go to the docker folder and execute "docker-compose up -d" to let docker-compose
+do it's job. Find out how to install docker compose here:
+[[https://docs.docker.com/compose/install/linux/]]
