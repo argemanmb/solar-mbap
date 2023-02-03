@@ -8,6 +8,7 @@ apiUrl = "https://api.smartthings.com/v1/devices/"
 
 class SmartthingDevice:
     def __init__(self, deviceID, deviceName, token, targetHeat, targetCool):
+        self.status = None
         self.id = deviceID
         self.name = deviceName
         self.header = {"Authorization": "Bearer " + token}
@@ -20,12 +21,12 @@ class SmartthingDevice:
     def executeCommand(self, data):
         requests.post(apiUrl + self.id + "/commands", data=data, headers=self.header)
 
-    def activate():
+    def activate(self):
         if(self.__active):
             return
         self.__active = True
         self.__saveStatus()
-        self.setValues("on", targetHeat)
+        self.setValues("on", self.targetHeat)
 
     def __saveStatus(self):
         self.__originalTemp = self.status["components"]["main"]["thermostatCoolingSetpoint"]["coolingSetpoint"]["value"]
@@ -34,6 +35,7 @@ class SmartthingDevice:
     def deactivate(self):
         if(self.__active):
             self.setValues(self.__originalState, self.__originalTemp)
+            self.__active = False
 
     def setValues(self, state, temperature):
         data = {
@@ -51,26 +53,31 @@ class SmartthingDevice:
                 }
             ]
         }
+        print("executing COMMAND::: ")
+        print(data)
         self.executeCommand(data)
-        self.updateStatus()
+        self.updateStatus(True)
 
     def __isStatusChanged(self, newStatus):
+        if(self.status is None):
+            return True
         if((self.status["components"]["main"]["thermostatCoolingSetpoint"]["coolingSetpoint"]["value"] ==
            newStatus["components"]["main"]["thermostatCoolingSetpoint"]["coolingSetpoint"]["value"]) and
            (self.status["components"]["main"]["switch"]["switch"]["value"] ==
            newStatus["components"]["main"]["switch"]["switch"]["value"])):
-            return false
+            return False
         self.lastManualInput = datetime.datetime.now()
-        return true
+        return True
 
-    def updateStatus(self):
+    def updateStatus(self, ignore=False):
         response = requests.get(apiUrl + self.id+"/status", headers=self.header)
         if not response.status_code == 200:
             print ("resonse code wrong")
             print ( response.status_code )
         else:
             newStatus = response.json()
-            self.__isStatusChanged(newStatus)
+            if(not ignore):
+                self.__isStatusChanged(newStatus)
             self.status = newStatus
 
     def printStatus(self):
