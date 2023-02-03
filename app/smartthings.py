@@ -29,8 +29,8 @@ class SmartthingDevice:
         self.setValues("on", self.targetHeat)
 
     def __saveStatus(self):
-        self.__originalTemp = self.status["components"]["main"]["thermostatCoolingSetpoint"]["coolingSetpoint"]["value"]
-        self.__originalState = self.status["components"]["main"]["switch"]["switch"]["value"]
+        self.__originalTemp = self.status.setPoint
+        self.__originalState = self.status.switch
 
     def deactivate(self):
         if(self.__active):
@@ -58,29 +58,31 @@ class SmartthingDevice:
         self.executeCommand(data)
         self.updateStatus(True)
 
-    def __isStatusChanged(self, newStatus):
-        if(self.status is None):
-            return True
-        if((self.status["components"]["main"]["thermostatCoolingSetpoint"]["coolingSetpoint"]["value"] ==
-           newStatus["components"]["main"]["thermostatCoolingSetpoint"]["coolingSetpoint"]["value"]) and
-           (self.status["components"]["main"]["switch"]["switch"]["value"] ==
-           newStatus["components"]["main"]["switch"]["switch"]["value"])):
-            return False
-        self.lastManualInput = datetime.datetime.now()
-        return True
-
-    def updateStatus(self, ignore=False):
+    def updateStatus(self, ignoreChange=False):
         response = requests.get(apiUrl + self.id+"/status", headers=self.header)
         if not response.status_code == 200:
             print ("resonse code wrong")
             print ( response.status_code )
         else:
-            newStatus = response.json()
-            if(not ignore):
-                self.__isStatusChanged(newStatus)
+            newStatus = smartthingsDeviceStatus(response.json())
+            if(not ignoreChange):
+                if(self.status is None or not self.status.isIdentical(newStatus)):
+                   self.lastManualInput = datetime.datetime.now()
             self.status = newStatus
 
     def printStatus(self):
-        print(self.status["components"]["main"]["temperatureMeasurement"]["temperature"]["value"])
-        print(self.status["components"]["main"]["thermostatCoolingSetpoint"]["coolingSetpoint"]["value"])
-        print(self.status["components"]["main"]["switch"]["switch"]["value"])
+        print("Temperature:" , self.status.temperature)
+        print("Solltemperatur:" , self.status.setPoint)
+        print("Schaltzustand:" , self.status.switch)
+
+class smartthingsDeviceStatus:
+    def __init__(self, statusJson):
+        self.temperature = statusJson["components"]["main"]["temperatureMeasurement"]["temperature"]["value"]
+        self.setPoint = statusJson["components"]["main"]["thermostatCoolingSetpoint"]["coolingSetpoint"]["value"]
+        self.switch = statusJson["components"]["main"]["switch"]["switch"]["value"]
+
+    def isIdentical(self, newStatus):
+        unchanged = True
+        unchanged &= self.setPoint == newStatus.setPoint
+        unchanged &= self.switch == newStatus.switch
+        return unchanged
