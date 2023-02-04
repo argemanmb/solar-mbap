@@ -11,6 +11,7 @@ class qcellDevice:
         self.feedInThreshold = feedInThreshold
         self.minFeedInHighPhase = minFeedInHighPhase
         self.feedInHighStart = None
+        self.feedInLowStart = None
 
     def getStatus(self):
         response = requests.get(apiUrl+self.token+"&sn="+self.sn)
@@ -29,4 +30,15 @@ class qcellDevice:
                 self.feedInHighStart = datetime.datetime.now()
         else:
             self.feedInHighStart = None
+        return False
+
+    def isFeedinLow(self):
+        if((self.status["result"]["feedinpower"] + self.status["result"]["batPower"]) < 0):
+            if (self.feedInLowStart != None):
+                if(self.minFeedInHighPhase < (datetime.datetime.now() - self.feedInLowStart)):
+                    return True
+            else:
+                self.feedInLowStart = datetime.datetime.now()
+        else:
+            self.feedInLowStart = None
         return False

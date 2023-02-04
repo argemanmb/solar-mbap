@@ -70,9 +70,8 @@ class SmartthingDevice:
             print ( response.status_code )
         else:
             newStatus = smartthingsDeviceStatus(response.json())
-            if(not ignoreChange):
-                if(self.status is None or not self.status.isIdentical(newStatus)):
-                   self.lastManualInput = datetime.datetime.now()
+            if(self.status is None or not self.status.isIdentical(newStatus)):
+                self.lastManualInput = datetime.datetime.now()
             self.status = newStatus
 
     def printStatus(self):

@@ -33,8 +33,9 @@ with open("config.json") as configuration:
                     print("HIGH input, enable ac")
                     devices[dev].activate()
                 else:
-                    print("LOW input, no ac")
-                    devices[dev].deactivate()
+                    if (wechselrichter.isFeedinLow()):
+                        print("LOW input, deactivate ac")
+                        devices[dev].deactivate()
             else:
                 print ("There were manual updates, need to keep hands off\n")
         time.sleep(300)
