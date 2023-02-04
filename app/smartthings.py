@@ -19,7 +19,10 @@ class SmartthingDevice:
         self.__active = False
 
     def executeCommand(self, data):
-        requests.post(apiUrl + self.id + "/commands", data=data, headers=self.header)
+        response = requests.post(apiUrl + self.id + "/commands", data=data, headers=self.header)
+        if not response.status_code == 200:
+            print ("resonse code wrong")
+            print ( response.status_code )
 
     def activate(self):
         if(self.__active):
@@ -49,13 +52,13 @@ class SmartthingDevice:
                     "component": "main",
                     "capability": "thermostatCoolingSetpoint",
                     "command": "setCoolingSetpoint",
-                    "arguments": [temperature]
+                    "arguments": [int(temperature)]
                 }
             ]
         }
         print("executing COMMAND::: ")
         print(data)
-        self.executeCommand(data)
+        self.executeCommand(json.dumps(data))
         self.updateStatus(True)
 
     def updateStatus(self, ignoreChange=False):
