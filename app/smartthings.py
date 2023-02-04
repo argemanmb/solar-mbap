@@ -3,6 +3,7 @@
 import requests
 import json
 import datetime
+import time
 
 apiUrl = "https://api.smartthings.com/v1/devices/"
 
@@ -59,9 +60,10 @@ class SmartthingDevice:
         print("executing COMMAND::: ")
         print(data)
         self.executeCommand(json.dumps(data))
-        self.updateStatus(True)
+        self.status.setPoint = temperature
+        self.status.switch = state
 
-    def updateStatus(self, ignoreChange=False):
+    def updateStatus(self):
         response = requests.get(apiUrl + self.id+"/status", headers=self.header)
         if not response.status_code == 200:
             print ("resonse code wrong")
