@@ -1,25 +1,23 @@
 #!/usr/bin/env python3
 
-import smartthings
 import qcells
 import json
 import datetime
 import time
+import deviceFactory
 
 with open("config.json") as configuration:
     jsonData = json.load(configuration)
+    factory = deviceFactory.deviceFactory()
     token = jsonData["smartthings"]["token"]
     handsoffTime = datetime.timedelta(minutes=int(jsonData["handsOffTime"]))
     devices = {}
     prios = []
     for device in jsonData["smartthings"]["devices"]:
-        deviceId = device["id"]
-        targetHeat = device["targetTempHeating"]
-        targetCool = device["targetTempCooling"]
         prio = device["prio"]
         if(prio not in prios):
             prios.append(prio)
-        devices[device["name"]] = smartthings.SmartthingDevice(deviceId, device["name"], token, targetHeat, targetCool, prio)
+        devices[device["name"]] = factory.addDevice(token, device)
 
     prios.sort()
     priolevels = len(prios)

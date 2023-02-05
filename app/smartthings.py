@@ -8,17 +8,17 @@ import time
 apiUrl = "https://api.smartthings.com/v1/devices/"
 
 class SmartthingDevice:
-    def __init__(self, deviceID, deviceName, token, targetHeat, targetCool, prio):
+    def __init__(self, token, config):
         self.status = None
-        self.id = deviceID
-        self.name = deviceName
+        self.id = config["id"]
+        self.name = config["name"]
         self.header = {"Authorization": "Bearer " + token}
         self.updateStatus()
         self.lastManualInput = datetime.datetime.now()
-        self.targetHeat = targetHeat
-        self.targetCool = targetCool
+        self.targetHeat = config["targetTempHeating"]
+        self.targetCool = config["targetTempCooling"]
         self.__active = False
-        self.prio = prio
+        self.prio = config["prio"]
 
     def executeCommand(self, data):
         try:
