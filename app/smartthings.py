@@ -8,7 +8,7 @@ import time
 apiUrl = "https://api.smartthings.com/v1/devices/"
 
 class SmartthingDevice:
-    def __init__(self, deviceID, deviceName, token, targetHeat, targetCool):
+    def __init__(self, deviceID, deviceName, token, targetHeat, targetCool, prio):
         self.status = None
         self.id = deviceID
         self.name = deviceName
@@ -18,6 +18,7 @@ class SmartthingDevice:
         self.targetHeat = targetHeat
         self.targetCool = targetCool
         self.__active = False
+        self.prio = prio
 
     def executeCommand(self, data):
         try:
