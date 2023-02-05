@@ -14,9 +14,13 @@ class qcellDevice:
         self.feedInLowStart = None
 
     def getStatus(self):
-        response = requests.get(apiUrl+self.token+"&sn="+self.sn)
+        try:
+            response = requests.get(apiUrl+self.token+"&sn="+self.sn)
+        except:
+            raise ConnectionError
         if not response.status_code == 200:
             print ("something went wrong")
+            raise ConnectionError
         else:
             self.status = response.json()
             return self.status

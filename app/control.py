@@ -21,6 +21,7 @@ with open("config.json") as configuration:
     feedInDelta = datetime.timedelta(minutes=int(qcellJson["feedInHighMinutes"]))
     wechselrichter = qcells.qcellDevice(qcellJson["token"], qcellJson["sn"], qcellJson["feedInThreshold"], feedInDelta)
 
+    print("Initialization successfull")
     while(True):
         try:
             print(wechselrichter.getStatus())
@@ -43,7 +44,13 @@ with open("config.json") as configuration:
             print ("Done for now, continue at ", waitUntil)
             while(waitUntil > datetime.datetime.now()):
                 time.sleep(1)
-        except:
+        except ConnectionError as e:
+            print("connection issues")
+            time.sleep(1)
+        except Exception as ex:
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(ex).__name__, ex.args)
+            print ( message )
             print("exiting...")
             for dev in devices:
                 try:

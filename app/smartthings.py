@@ -20,10 +20,14 @@ class SmartthingDevice:
         self.__active = False
 
     def executeCommand(self, data):
-        response = requests.post(apiUrl + self.id + "/commands", data=data, headers=self.header)
+        try:
+            response = requests.post(apiUrl + self.id + "/commands", data=data, headers=self.header)
+        except:
+            raise ConnectionError
         if not response.status_code == 200:
             print ("resonse code wrong")
             print ( response.status_code )
+            raise ConnectionError
 
     def activate(self):
         if(self.__active):
@@ -64,10 +68,14 @@ class SmartthingDevice:
         self.status.switch = state
 
     def updateStatus(self):
-        response = requests.get(apiUrl + self.id+"/status", headers=self.header)
+        try:
+            response = requests.get(apiUrl + self.id+"/status", headers=self.header)
+        except:
+            raise ConnectionError
         if not response.status_code == 200:
             print ("resonse code wrong")
             print ( response.status_code )
+            raise ConnectionError
         else:
             newStatus = smartthingsDeviceStatus(response.json())
             if(self.status is None or not self.status.isIdentical(newStatus)):
