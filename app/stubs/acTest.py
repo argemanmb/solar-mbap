@@ -4,6 +4,7 @@ class acTest:
     def __init__(self, token, config):
         self.config = config
         self.active = False
+        self.name = config["name"]
         self.prio = config["prio"]
 
     def activate(self):
@@ -14,6 +15,7 @@ class acTest:
             raise Exception("fail: device wurde aktiviert:", self.config["name"])
 
     def deactivate(self):
+        print("deactivate", self.name)
         self.active = False
 
     def updateStatus(self):
