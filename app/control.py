@@ -32,13 +32,14 @@ with open(configFile) as configuration:
     qcellJson = jsonData["qcells"]["devices"][0]
     inverterFactory = inverterFactory.inverterFactory()
     wechselrichter = inverterFactory.addDevice(qcellJson)
-
     print("Initialization successfull")
+
     while(True):
         try:
             print(wechselrichter.getStatus())
             waitUntil = datetime.datetime.now() + datetime.timedelta(minutes=jsonData["interval"])
             for dev in devices:
+                # erstmal alle Informationen sammeln
                 devices[dev].updateStatus()
                 devices[dev].printStatus()
 
@@ -77,4 +78,4 @@ with open(configFile) as configuration:
                     devices[dev].deactivate()
                 except:
                     print("error while deacivating", dev)
-                exit(0)
+            exit(0)
