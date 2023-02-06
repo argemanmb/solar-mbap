@@ -1,0 +1,73 @@
+{
+    "handsOffTime" : "120",
+    "interval" : 0,
+    "qcells":
+    {
+        "devices":
+        [
+            {
+                "type":"inverterStub",
+                "name":"wechselrichter",
+                "token":"",
+                "sn":"",
+                "feedInHigh": 2,
+                "feedInLow":2
+            }
+        ]
+    },
+    "smartthings":
+    {
+        "token":"",
+        "devices":
+        [
+            {
+                "type":"acStub",
+                "name":"wohnzimmer",
+                "id":"",
+                "targetTempHeating":"22",
+                "targetTempCooling":"23",
+                "feedInHigh":1,
+                "feedInHigh":1,
+                "activateAllowed":1,
+                "prio":1
+            },
+            {
+                "type":"acStub",
+                "name":"Spielzimmer",
+                "id":"",
+                "targetTempHeating":"22",
+                "targetTempCooling":"23",
+                "activateAllowed":1,
+                "prio":4
+            },
+            {
+                "type":"acStub",
+                "name": "Kinderzimmer",
+                "id":"",
+                "targetTempHeating":"22",
+                "targetTempCooling":"23",
+                "activateAllowed":1,
+                "prio":3
+            },
+            {
+                "type":"acStub",
+                "name":"Schlafzimmer Kinder",
+                "id":"",
+                "targetTempHeating":"22",
+                "activateAllowed":1,
+                "targetTempCooling":"23",
+                "prio":2
+            },
+            {
+                "type":"acStub",
+                "name":"Schlafzimmer Eltern",
+                "id":"",
+                "targetTempHeating":"22",
+                "targetTempCooling":"23",
+                "activateAllowed":1,
+                "prio":2
+
+            }
+        ]
+    }
+}

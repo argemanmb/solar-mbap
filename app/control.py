@@ -5,14 +5,21 @@ import datetime
 import time
 import deviceFactory
 import inverterFactory
+import sys
+import traceback
 
-with open("config.json") as configuration:
+if(len(sys.argv) > 1):
+    configFile = arg1 = sys.argv[1]
+else:
+    configFile = "config.json"
+
+with open(configFile) as configuration:
     jsonData = json.load(configuration)
     factory = deviceFactory.deviceFactory()
     token = jsonData["smartthings"]["token"]
     handsoffTime = datetime.timedelta(minutes=int(jsonData["handsOffTime"]))
     devices = {}
-    prios = []
+    prios = [-1] # -1 as the "invalid" prio
     for device in jsonData["smartthings"]["devices"]:
         prio = device["prio"]
         if(prio not in prios):
@@ -21,7 +28,7 @@ with open("config.json") as configuration:
 
     prios.sort()
     priolevels = len(prios)
-    currentPrioIndex = -1
+    currentPrioIndex = 0
     qcellJson = jsonData["qcells"]["devices"][0]
     inverterFactory = inverterFactory.inverterFactory()
     wechselrichter = inverterFactory.addDevice(qcellJson)
@@ -30,25 +37,26 @@ with open("config.json") as configuration:
     while(True):
         try:
             print(wechselrichter.getStatus())
-            waitUntil = datetime.datetime.now() + datetime.timedelta(minutes=5)
+            waitUntil = datetime.datetime.now() + datetime.timedelta(minutes=jsonData["interval"])
             for dev in devices:
                 devices[dev].updateStatus()
                 devices[dev].printStatus()
 
-            if(wechselrichter.isFeedinHigh() and currentPrioIndex < priolevels):
+            if(wechselrichter.isFeedinHigh() and currentPrioIndex < priolevels-1):
                 currentPrioIndex += 1
-            if(wechselrichter.isFeedinLow() and currentPrioIndex > -1):
+                print("New prio:", prios[currentPrioIndex])
+            if(wechselrichter.isFeedinLow() and currentPrioIndex > 0):
                 currentPrioIndex -= 1
 
             for dev in devices:
                 noManualUpdates = devices[dev].isAvailable(handsoffTime)
                 if(noManualUpdates):
                     print("no manual updates, can do stuff!")
-                    if(wechselrichter.isFeedinHigh() and device[dev].prio >= prios[currentPrioIndex]):
-                        print("HIGH input, enable ac")
+                    if(devices[dev].prio <= prios[currentPrioIndex]):
+                        print("HIGH input, enable ac", dev)
                         devices[dev].activate()
-                    if (device[dev].prio < prios[currentPrioIndex]):
-                        print("LOW input, deactivate ac")
+                    if (devices[dev].prio > prios[currentPrioIndex]):
+                        print("LOW input, deactivate ac", dev)
                         devices[dev].deactivate()
                 else:
                     print ("There were manual updates, need to keep hands off")
@@ -62,6 +70,7 @@ with open("config.json") as configuration:
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
             message = template.format(type(ex).__name__, ex.args)
             print ( message )
+            print(traceback.format_exc())
             print("exiting...")
             for dev in devices:
                 try:

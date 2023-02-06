@@ -2,16 +2,25 @@
 
 class acTest:
     def __init__(self, token, config):
-        pass
+        self.config = config
+        self.active = False
+        self.prio = config["prio"]
 
     def activate(self):
-        pass
+        if(self.config["activateAllowed"]):
+            self.active = True
+            return
+        else:
+            raise Exception("fail: device wurde aktiviert:", self.config["name"])
 
     def deactivate(self):
-        pass
+        self.active = False
 
     def updateStatus(self):
         pass
 
-    def isAvailable(self):
+    def isAvailable(self, handsoffTime):
         return True
+
+    def printStatus(self):
+        pass
