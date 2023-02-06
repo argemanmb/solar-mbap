@@ -5,11 +5,11 @@ import datetime
 apiUrl = "https://qhome-ess-g3.q-cells.eu/proxyApp/proxy/api/getRealtimeInfo.do?tokenId="
 
 class qcellDevice:
-    def __init__(self,token, sn, feedInThreshold, minFeedInHighPhase):
-        self.token=token
-        self.sn=sn
-        self.feedInThreshold = feedInThreshold
-        self.minFeedInHighPhase = minFeedInHighPhase
+    def __init__(self, qcellJson):
+        self.token = qcellJson["token"]
+        self.sn = qcellJson["sn"]
+        self.minFeedInHighPhase = datetime.timedelta(minutes=int(qcellJson["feedInHighMinutes"]))
+        self.feedInThreshold = qcellJson["feedInThreshold"]
         self.feedInHighStart = None
         self.feedInLowStart = None
 

@@ -88,6 +88,11 @@ class SmartthingDevice:
         print("Solltemperatur:" , self.status.setPoint)
         print("Schaltzustand:" , self.status.switch)
 
+    def isAvailable(self, handsoffTime):
+        if((datetime.datetime.now() - self.lastManualInput) > handsoffTime):
+            return True
+        return False
+
 class smartthingsDeviceStatus:
     def __init__(self, statusJson):
         self.temperature = statusJson["components"]["main"]["temperatureMeasurement"]["temperature"]["value"]

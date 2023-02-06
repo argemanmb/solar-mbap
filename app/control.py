@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-import qcells
 import json
 import datetime
 import time
 import deviceFactory
+import inverterFactory
 
 with open("config.json") as configuration:
     jsonData = json.load(configuration)
@@ -23,8 +23,8 @@ with open("config.json") as configuration:
     priolevels = len(prios)
     currentPrioIndex = -1
     qcellJson = jsonData["qcells"]["devices"][0]
-    feedInDelta = datetime.timedelta(minutes=int(qcellJson["feedInHighMinutes"]))
-    wechselrichter = qcells.qcellDevice(qcellJson["token"], qcellJson["sn"], qcellJson["feedInThreshold"], feedInDelta)
+    inverterFactory = inverterFactory.inverterFactory()
+    wechselrichter = inverterFactory.addDevice(qcellJson)
 
     print("Initialization successfull")
     while(True):
@@ -41,7 +41,7 @@ with open("config.json") as configuration:
                 currentPrioIndex -= 1
 
             for dev in devices:
-                noManualUpdates = (datetime.datetime.now() - devices[dev].lastManualInput) > handsoffTime
+                noManualUpdates = devices[dev].isAvailable(handsoffTime)
                 if(noManualUpdates):
                     print("no manual updates, can do stuff!")
                     if(wechselrichter.isFeedinHigh() and device[dev].prio >= prios[currentPrioIndex]):
