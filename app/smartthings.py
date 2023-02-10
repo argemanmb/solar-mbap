@@ -33,9 +33,9 @@ class SmartthingDevice:
     def activate(self):
         if(self.__active):
             return
-        self.__active = True
         self.__saveStatus()
         self.setValues("on", self.targetHeat)
+        self.__active = True
 
     def __saveStatus(self):
         self.__originalTemp = self.status.setPoint
