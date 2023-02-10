@@ -1,2 +1,3 @@
 app/config.json
 **__pycache*
+/app/wakeuptime
