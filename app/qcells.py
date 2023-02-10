@@ -38,11 +38,5 @@ class qcellDevice:
 
     def isFeedinLow(self):
         if((self.status["result"]["feedinpower"] + self.status["result"]["batPower"]) < 0):
-            if (self.feedInLowStart != None):
-                if(self.minFeedInHighPhase < (datetime.datetime.now() - self.feedInLowStart)):
-                    return True
-            else:
-                self.feedInLowStart = datetime.datetime.now()
-        else:
-            self.feedInLowStart = None
+            return True
         return False
