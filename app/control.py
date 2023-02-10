@@ -9,6 +9,16 @@ import sys
 import traceback
 import wakeup
 
+
+class controlConfig:
+    def __init__(self, jsonData):
+        self.devToken = jsonData["smartthings"]["token"]
+        self.handsOffTime = jsonData["handsOffTime"]
+        self.interval = jsonData["interval"]
+
+
+
+
 if(len(sys.argv) > 1):
     configFile = arg1 = sys.argv[1]
 else:
@@ -16,16 +26,16 @@ else:
 
 with open(configFile) as configuration:
     jsonData = json.load(configuration)
+config = controlConfig(jsonData)
 factory = deviceFactory.deviceFactory()
-token = jsonData["smartthings"]["token"]
-handsoffTime = datetime.timedelta(minutes=int(jsonData["handsOffTime"]))
+handsoffTime = datetime.timedelta(minutes=int(config.handsOffTime))
 devices = {}
 prios = [-1] # -1 as the "invalid" prio
 for device in jsonData["smartthings"]["devices"]:
     prio = device["prio"]
     if(prio not in prios):
         prios.append(prio)
-    devices[device["name"]] = factory.addDevice(token, device)
+    devices[device["name"]] = factory.addDevice(config.devToken, device)
 
 prios.sort()
 priolevels = len(prios)
@@ -38,7 +48,7 @@ print("Initialization successfull")
 while(True):
     try:
         print(wechselrichter.getStatus())
-        waitUntil = datetime.datetime.now() + datetime.timedelta(minutes=jsonData["interval"])
+        waitUntil = datetime.datetime.now() + datetime.timedelta(minutes=config.interval)
         for dev in devices:
             # erstmal alle Informationen sammeln
             devices[dev].updateStatus()
