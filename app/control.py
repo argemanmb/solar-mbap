@@ -16,7 +16,26 @@ class controlConfig:
         self.handsOffTime = jsonData["handsOffTime"]
         self.interval = jsonData["interval"]
 
+class prioHandler:
+    def __init__(self):
+        self.prios = [-1]
+        self.prioIndex = 0
 
+    def addPrioLevel(self, prio):
+        if(prio not in self.prios):
+            self.prios.append(prio)
+            self.prios.sort()
+
+    def increasePrio(self):
+        if(len(self.prios) > (self.prioIndex + 1)):
+            self.prioIndex += 1
+
+    def decreasePrio(self):
+        if(self.prioIndex>0):
+            self.prioIndex -= 1
+
+    def getPrio(self):
+        return self.prios[self.prioIndex]
 
 
 if(len(sys.argv) > 1):
@@ -30,16 +49,11 @@ config = controlConfig(jsonData)
 factory = deviceFactory.deviceFactory()
 handsoffTime = datetime.timedelta(minutes=int(config.handsOffTime))
 devices = {}
-prios = [-1] # -1 as the "invalid" prio
+prios = prioHandler()
 for device in jsonData["smartthings"]["devices"]:
-    prio = device["prio"]
-    if(prio not in prios):
-        prios.append(prio)
+    prios.addPrioLevel(device["prio"])
     devices[device["name"]] = factory.addDevice(config.devToken, device)
 
-prios.sort()
-priolevels = len(prios)
-currentPrioIndex = 0
 qcellJson = jsonData["qcells"]["devices"][0]
 inverterFactory = inverterFactory.inverterFactory()
 wechselrichter = inverterFactory.addDevice(qcellJson)
@@ -54,20 +68,21 @@ while(True):
             devices[dev].updateStatus()
             devices[dev].printStatus()
 
-        if(wechselrichter.isFeedinHigh() and currentPrioIndex < priolevels-1):
-            currentPrioIndex += 1
-            print("New prio:", prios[currentPrioIndex])
-        if(wechselrichter.isFeedinLow() and currentPrioIndex > 0):
-            currentPrioIndex -= 1
+        if(wechselrichter.isFeedinHigh()):
+            prios.increasePrio()
+            print("New prio:", prios.getPrio())
+        if(wechselrichter.isFeedinLow()):
+            prios.decreasePrio()
 
         for dev in devices:
             noManualUpdates = devices[dev].isAvailable(handsoffTime)
             if(noManualUpdates):
+                currentPrio = prios.getPrio()
                 print("no manual updates, can do stuff!")
-                if(devices[dev].prio <= prios[currentPrioIndex]):
+                if(devices[dev].prio <= currentPrio):
                     print("HIGH input, enable ac", dev)
                     devices[dev].activate()
-                if (devices[dev].prio > prios[currentPrioIndex]):
+                if (devices[dev].prio > currentPrio):
                     print("LOW input, deactivate ac", dev)
                     devices[dev].deactivate()
             else:
