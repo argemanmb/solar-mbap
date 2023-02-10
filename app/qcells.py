@@ -4,6 +4,15 @@ import requests
 import datetime
 apiUrl = "https://qhome-ess-g3.q-cells.eu/proxyApp/proxy/api/getRealtimeInfo.do?tokenId="
 
+class inverterStatus:
+    def __init__(self):
+        pass
+
+
+    def update(jsonData):
+        self.data = jsonData
+        self.feedInPower = jsonData["result"]["feedinpower"]
+        self.batPower = jsonData["result"]["batPower"]
 class qcellDevice:
     def __init__(self, qcellJson):
         self.token = qcellJson["token"]
@@ -12,6 +21,7 @@ class qcellDevice:
         self.feedInThreshold = qcellJson["feedInThreshold"]
         self.feedInHighStart = None
         self.feedInLowStart = None
+        self.status = inverterStatus()
 
     def getStatus(self):
         try:
@@ -22,11 +32,11 @@ class qcellDevice:
             print ("something went wrong")
             raise ConnectionError
         else:
-            self.status = response.json()
-            return self.status
+            self.status.update(response.json())
+            return response.json()
 
     def isFeedinHigh(self):
-        if(float(self.feedInThreshold) < self.status["result"]["feedinpower"]):
+        if(float(self.feedInThreshold) < self.status.feedInPower):
             if (self.feedInHighStart != None):
                 if(self.minFeedInHighPhase < (datetime.datetime.now() - self.feedInHighStart)):
                     return True
@@ -37,6 +47,6 @@ class qcellDevice:
         return False
 
     def isFeedinLow(self):
-        if((self.status["result"]["feedinpower"] + self.status["result"]["batPower"]) < 0):
+        if((self.status.feedInPower + self.status.batPower) < 0):
             return True
         return False
