@@ -8,11 +8,24 @@ class inverterStatus:
     def __init__(self):
         pass
 
-
-    def update(jsonData):
+    def update(self, jsonData):
         self.data = jsonData
         self.feedInPower = jsonData["result"]["feedinpower"]
         self.batPower = jsonData["result"]["batPower"]
+
+    @property
+    def generatedPower(self):
+        power = list()
+        power.append( self.data["result"]["powerdc1"])
+        power.append( self.data["result"]["powerdc2"])
+        power.append( self.data["result"]["powerdc3"])
+        power.append( self.data["result"]["powerdc4"])
+        powerSum = 0
+        for singlePower in power:
+            if (type( singlePower ) is float):
+                powerSum += singlePower
+        return powerSum
+
 class qcellDevice:
     def __init__(self, qcellJson):
         self.token = qcellJson["token"]
@@ -34,6 +47,10 @@ class qcellDevice:
         else:
             self.status.update(response.json())
             return response.json()
+
+    @property
+    def generatedPower(self):
+        return self.status.generatedPower
 
     def isFeedinHigh(self):
         if(float(self.feedInThreshold) < self.status.feedInPower):

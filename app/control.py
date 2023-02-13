@@ -62,12 +62,20 @@ print("Initialization successfull")
 while(True):
     try:
         print(wechselrichter.getStatus())
+        # waiting for some time, longer if the power is low...
         waitUntil = datetime.datetime.now() + datetime.timedelta(minutes=config.interval)
+        if (wechselrichter.generatedPower < 1000):
+            waitUntil = datetime.datetime.now() + datetime.timedelta(minutes=20)
+        if (wechselrichter.generatedPower < 100):
+            waitUntil = datetime.datetime.now() + datetime.timedelta(minutes=40)
+        if (wechselrichter.generatedPower < 1):
+            waitUntil = datetime.datetime.now() + datetime.timedelta(minutes=120)
         for dev in devices:
             # erstmal alle Informationen sammeln
             devices[dev].updateStatus()
             devices[dev].printStatus()
 
+        print ("Power vom Dach:", wechselrichter.generatedPower)
         if(wechselrichter.isFeedinHigh()):
             prios.increasePrio()
             print("New prio:", prios.getPrio())

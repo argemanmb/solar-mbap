@@ -26,3 +26,7 @@ class invTest:
                     raise Exception("passed")
                 return True
         return False
+
+    @property
+    def generatedPower(self):
+        return 10000
