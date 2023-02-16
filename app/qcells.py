@@ -2,9 +2,10 @@
 
 import requests
 import datetime
+import inverter
 apiUrl = "https://qhome-ess-g3.q-cells.eu/proxyApp/proxy/api/getRealtimeInfo.do?tokenId="
 
-class inverterStatus:
+class inverterStatus():
     def __init__(self):
         pass
 
@@ -26,7 +27,7 @@ class inverterStatus:
                 powerSum += singlePower
         return powerSum
 
-class qcellDevice:
+class qcellDevice(inverter.inverter):
     def __init__(self, qcellJson):
         self.token = qcellJson["token"]
         self.sn = qcellJson["sn"]
