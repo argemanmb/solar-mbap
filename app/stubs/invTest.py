@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-class invTest:
+import inverter
+
+class invTest(inverter.inverter):
     def __init__(self, config):
        self.config = config
        self.fhcount = 0

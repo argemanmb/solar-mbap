@@ -5,7 +5,7 @@ from abc import ABC, ABCMeta, abstractmethod
 class inverter(ABC):
     @classmethod
     @abstractmethod
-    def __init__(self):
+    def __init__(self, jsonData):
         pass
 
     @classmethod
@@ -15,14 +15,8 @@ class inverter(ABC):
 
     @classmethod
     @abstractmethod
-    def update(self, jsonData):
-        pass
-
-    @classmethod
-    @abstractmethod
     def isFeedinHigh(self):
         pass
-
 
     @classmethod
     @abstractmethod
