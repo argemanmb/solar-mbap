@@ -83,6 +83,19 @@ class SmartthingDevice:
                 self.lastManualInput = datetime.datetime.now()
             self.status = newStatus
 
+    def printDevices(self):
+        try:
+            response = requests.get(apiUrl , headers=self.header)
+        except:
+            raise ConnectionError
+        if not response.status_code == 200:
+            print ("resonse code wrong")
+            print ( response.status_code )
+            raise ConnectionError
+        else:
+            with open("devices.json", "w") as devFile:
+                devFile.write(json.dumps(response.json()))
+
     def printStatus(self):
         print("Temperature:" , self.status.temperature)
         print("Solltemperatur:" , self.status.setPoint)

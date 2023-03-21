@@ -54,6 +54,9 @@ for device in jsonData["smartthings"]["devices"]:
     prios.addPrioLevel(device["prio"])
     devices[device["name"]] = factory.addDevice(config.devToken, device)
 
+for dev in devices:
+    devices[dev].printDevices()
+    break
 qcellJson = jsonData["qcells"]["devices"][0]
 inverterFactory = inverterFactory.inverterFactory()
 wechselrichter = inverterFactory.addDevice(qcellJson)
