@@ -19,6 +19,8 @@ class SmartthingDevice:
         self.targetCool = config["targetTempCooling"]
         self.__active = False
         self.prio = config["prio"]
+        self.__originalState = "unbekannt"
+        self.__originalTemp = "-"
 
     def executeCommand(self, data):
         try:
@@ -92,6 +94,21 @@ class SmartthingDevice:
         if((datetime.datetime.now() - self.lastManualInput) > handsoffTime):
             return True
         return False
+
+    def getTableEntries (self, handsoffTime):
+        retVal = "<tr>"
+        retVal += "<th>" + self.name + "</th>"
+        if self.isAvailable(handsoffTime):
+            retVal += "<th>not blocked</th>"
+        else:
+            retVal += "<th>blocked until: " + (self.lastManualInput + handsoffTime).strftime('%d.%m.%y %H:%M:%S.%f') + "</th>"
+        activeStr = "active"
+        if(not self.__active):
+            activeStr = "inactive"
+        retVal += "<th>" + activeStr + "</th>"
+        retVal += "<th>Original Status: " + str( self.__originalState ) + "<br/>Original Temperatur:" + str( self.__originalTemp ) + "</th>"
+        retVal += "</tr>"
+        return retVal
 
 class smartthingsDeviceStatus:
     def __init__(self, statusJson):
