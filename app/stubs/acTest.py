@@ -26,3 +26,6 @@ class acTest:
 
     def printStatus(self):
         pass
+
+    def getTableEntries(self, handsoffTime):
+        return "nothing"

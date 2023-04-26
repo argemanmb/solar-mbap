@@ -37,7 +37,7 @@ class prioHandler:
     def getPrio(self):
         return self.prios[self.prioIndex]
 
-
+logEntries = list()
 if(len(sys.argv) > 1):
     configFile = arg1 = sys.argv[1]
 else:
@@ -59,6 +59,8 @@ inverterFactory = inverterFactory.inverterFactory()
 wechselrichter = inverterFactory.addDevice(qcellJson)
 print("Initialization successfull")
 
+logEntries.append(datetime.datetime.now().strftime('%d.%m.%y %H:%M:%S.%f') + " system initialized, prio: " + str(prios.getPrio()))
+
 while(True):
     try:
         print(wechselrichter.getStatus())
@@ -77,10 +79,17 @@ while(True):
 
         print ("Power vom Dach:", wechselrichter.generatedPower)
         if(wechselrichter.isFeedinHigh()):
+            oldPrio = prios.getPrio()
             prios.increasePrio()
             print("New prio:", prios.getPrio())
+            if(oldPrio != prios.getPrio()):
+                logEntries.append(datetime.datetime.now().strftime('%d.%m.%y %H:%M:%S.%f') + " High input, change level to " + str(prios.getPrio()))
+
         if(wechselrichter.isFeedinLow()):
+            oldPrio = prios.getPrio()
             prios.decreasePrio()
+            if(oldPrio != prios.getPrio()):
+                logEntries.append(datetime.datetime.now().strftime('%d.%m.%y %H:%M:%S.%f') + " Low input, change level to " + str(prios.getPrio()))
 
         for dev in devices:
             noManualUpdates = devices[dev].isAvailable(handsoffTime)
@@ -96,6 +105,24 @@ while(True):
             else:
                 print ("There were manual updates, need to keep hands off")
         print ("Done for now, continue at", waitUntil)
+        #update status information in index.html
+        with open("index.html", "w") as htmlFile:
+            htmlFile.write("""<html>
+<style>
+table, th, td {
+  border:1px solid black;
+}
+</style>
+<body>
+""")
+            htmlFile.write("""<table style="width:100%">""")
+            for dev in devices:
+                htmlFile.write(devices[dev].getTableEntries(handsoffTime))
+            htmlFile.write("</table><br/><br/><br/><br/>")
+            htmlFile.write("Status " + datetime.datetime.now().strftime('%d.%m.%y %H:%M:%S.%f') + "<br/><br/>")
+            for entry in ( logEntries ):
+                htmlFile.write(entry + "<br/>")
+
         wakeup.wakeup.updateTime(waitUntil - datetime.timedelta(seconds=20))
         while(waitUntil > datetime.datetime.now()):
             time.sleep(1)
