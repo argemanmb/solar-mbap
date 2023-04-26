@@ -120,6 +120,7 @@ table, th, td {
                 htmlFile.write(devices[dev].getTableEntries(handsoffTime))
             htmlFile.write("</table><br/><br/><br/><br/>")
             htmlFile.write("Status " + datetime.datetime.now().strftime('%d.%m.%y %H:%M:%S.%f') + "<br/><br/>")
+
             for entry in ( logEntries ):
                 htmlFile.write(entry + "<br/>")
 
