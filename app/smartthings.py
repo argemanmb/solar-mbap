@@ -82,6 +82,7 @@ class SmartthingDevice:
         else:
             newStatus = smartthingsDeviceStatus(response.json())
             if(self.status is None or not self.status.isIdentical(newStatus)):
+                self.__active = False
                 self.lastManualInput = datetime.datetime.now()
             self.status = newStatus
 
